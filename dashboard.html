@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AgriWaste to Worth</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-leaf"></i>
+                <span>AgriWaste to Worth</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="ai-analyzer.html">AI Analyzer</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-icon" id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="badge"
+                        id="cartBadge">0</span></button>
+                <button class="btn-icon" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge"
+                        id="notifBadge">0</span></button>
+                <div class="user-menu" id="userMenu" style="display:none">
+                    <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
+                    <span class="user-name">Guest</span>
+                    <span class="user-role-badge" id="userRoleBadge"
+                        style="margin-left:8px;background:#eee;padding:4px 8px;border-radius:12px;font-size:.8rem"></span>
+                    <button class="btn-text" id="logoutBtn" style="margin-left:12px">Logout</button>
+                </div>
+                <button class="btn-primary" id="loginBtn">Login</button>
+                <button class="btn-secondary" id="signupBtn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-section">
+        <div class="container-fluid">
+            <div class="dashboard-header animate-fade-up">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, <strong id="userName">User</strong></p>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn-outline"><i class="fas fa-download"></i> Export Data</button>
+                    <select id="dateRange" class="date-selector">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last Year</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid animate-fade-up" style="animation-delay: 0.2s">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-details">
+                        <span id="labelStat1">Total Earnings</span>
+                        <h3 id="totalEarnings">₹0</h3>
+                        <small class="stat-change positive"><i class="fas fa-arrow-up"></i> 12.5% from last
+                            month</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-recycle"></i>
+                    </div>
+                    <div class="stat-details">
+                        <span id="labelStat2">Waste Traded</span>
+                        <h3 id="wasteTraded">0 tons</h3>
+                        <small class="stat-change positive"><i class="fas fa-arrow-up"></i> 8.3% increase</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="stat-details">
+                        <span id="labelStat3">Transactions</span>
+                        <h3 id="totalTransactions">0</h3>
+                        <small class="stat-change neutral"><i class="fas fa-minus"></i> No change</small>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-details">
+                        <span id="labelStat4">Carbon Credits</span>
+                        <h3 id="carbonCredits">0 tons</h3>
+                        <small class="stat-change positive"><i class="fas fa-arrow-up"></i> 15.7% growth</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <!-- Revenue Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 id="titleChart1">Revenue Trend</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-chart="revenue">Revenue</button>
+                            <button class="chart-btn" data-chart="volume">Volume</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Waste Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 id="titleChart2">Waste Type Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="wasteDistChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Seasonality (Dashboard) -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 id="titleChart3">Price Seasonality</h3>
+                        <select id="seasonalityType" class="date-selector">
+                            <option value="rice-husk">Rice Husk</option>
+                            <option value="wheat-straw">Wheat Straw</option>
+                            <option value="sugarcane-bagasse">Sugarcane Bagasse</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="seasonalityChartDash"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity & Top Items -->
+            <div class="dashboard-grid">
+                <!-- Recent Transactions -->
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3 id="titleGrid1"><i class="fas fa-history" id="iconGrid1"></i> <span id="textGrid1">Recent
+                                Transactions</span></h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="transactions-list" id="transactionsList">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                    <div class="insights-list" id="ordersActions"></div>
+                </div>
+
+                <!-- Active Listings -->
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3 id="titleGrid2"><i class="fas fa-list" id="iconGrid2"></i> <span id="textGrid2">Your Active
+                                Listings</span></h3>
+                        <a href="#" class="view-all">Manage</a>
+                    </div>
+                    <div class="listings-list" id="activeListings">
+                        <!-- Listings will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Environmental Impact -->
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3 id="titleGrid3"><i class="fas fa-globe" id="iconGrid3"></i> <span
+                                id="textGrid3">Environmental Impact</span></h3>
+                    </div>
+                    <div class="impact-summary">
+                        <div class="impact-item">
+                            <i class="fas fa-cloud"></i>
+                            <div>
+                                <span>CO₂ Emissions Prevented</span>
+                                <h4 id="co2Prevented">0 tons</h4>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <i class="fas fa-tree"></i>
+                            <div>
+                                <span>Equivalent Trees Planted</span>
+                                <h4 id="treesPlanted">0</h4>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <i class="fas fa-award"></i>
+                            <div>
+                                <span>Sustainability Score</span>
+                                <h4 id="sustainScore">0/100</h4>
+                            </div>
+                        </div>
+                        <div class="impact-progress">
+                            <span>Progress to Next Level</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            </div>
+                            <small id="progressText">0% Complete</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h3 id="titleGrid4"><i class="fas fa-lightbulb" id="iconGrid4"></i> <span id="textGrid4">AI
+                                Insights & Recommendations</span></h3>
+                    </div>
+                    <div class="insights-list" id="insightsList">
+                        <div class="insight-item">
+                            <i class="fas fa-arrow-trend-up"></i>
+                            <p><strong>Market Opportunity:</strong> Rice husk demand increased by 25% this week.
+                                Consider listing if available.</p>
+                        </div>
+                        <div class="insight-item">
+                            <i class="fas fa-clock"></i>
+                            <p><strong>Best Time to Sell:</strong> Historical data shows highest prices for wheat straw
+                                in next 2 weeks.</p>
+                        </div>
+                        <div class="insight-item">
+                            <i class="fas fa-users"></i>
+                            <p><strong>New Buyers:</strong> 3 biomass processors matching your waste types joined
+                                recently.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Specific Performance -->
+            <div class="metrics-section">
+                <h3>Performance Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <i class="fas fa-star"></i>
+                        <h4>Seller Rating</h4>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <p id="sellerRating">4.8/5.0</p>
+                        </div>
+                        <small>Based on 42 reviews</small>
+                    </div>
+                    <div class="metric-box">
+                        <i class="fas fa-shipping-fast"></i>
+                        <h4>Delivery Rate</h4>
+                        <div class="circular-progress">
+                            <svg class="progress-ring" width="80" height="80">
+                                <circle class="progress-ring-circle" stroke="#e0e0e0" stroke-width="8"
+                                    fill="transparent" r="32" cx="40" cy="40" />
+                                <circle class="progress-ring-circle-fill" stroke="#4caf50" stroke-width="8"
+                                    fill="transparent" r="32" cx="40" cy="40" id="deliveryCircle" />
+                            </svg>
+                            <span class="progress-text" id="deliveryRate">98%</span>
+                        </div>
+                    </div>
+                    <div class="metric-box">
+                        <i class="fas fa-clock"></i>
+                        <h4>Avg. Response Time</h4>
+                        <h3 id="responseTime">2.3 hrs</h3>
+                        <small>Industry avg: 4.5 hrs</small>
+                    </div>
+                    <div class="metric-box">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Success Rate</h4>
+                        <h3 id="successRate">94%</h3>
+                        <small>Completed transactions</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Specific Widgets -->
+            <div class="metrics-section" id="roleWidgets">
+                <h3>Role-Specific Insights</h3>
+                <div class="dashboard-grid">
+                    <div class="activity-card" id="farmerWidget" style="display:none">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tractor"></i> Farmer Tools</h3>
+                        </div>
+                        <div class="insights-list" id="farmerTips"></div>
+                    </div>
+                    <div class="activity-card" id="buyerWidget" style="display:none">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cart-shopping"></i> Buyer Watchlist</h3>
+                        </div>
+                        <div class="insights-list" id="buyerWatchlist"></div>
+                    </div>
+                    <div class="activity-card" id="processorWidget" style="display:none">
+                        <div class="card-header">
+                            <h3><i class="fas fa-industry"></i> Processor KPIs</h3>
+                        </div>
+                        <div class="insights-list" id="processorKPIs"></div>
+                    </div>
+                    <div class="activity-card" id="ngoWidget" style="display:none">
+                        <div class="card-header">
+                            <h3><i class="fas fa-shield-alt"></i> Regulator Controls</h3>
+                        </div>
+                        <div class="insights-list">
+                            <style>
+                                .regulator-action-card {
+                                    background: #fdfdfd;
+                                    border: 1px solid #eaeaea;
+                                    border-radius: 8px;
+                                    padding: 20px;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    transition: all 0.3s ease;
+                                }
+
+                                .regulator-action-card:hover {
+                                    transform: translateY(-5px);
+                                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+                                    border-color: #3498db;
+                                }
+
+                                .regulator-action-card i {
+                                    font-size: 2rem;
+                                    margin-bottom: 15px;
+                                }
+
+                                .regulator-action-card h4 {
+                                    margin: 0 0 5px 0;
+                                    color: #2c3e50;
+                                    font-size: 1.1rem;
+                                }
+
+                                .regulator-action-card p {
+                                    margin: 0;
+                                    color: #7f8c8d;
+                                    font-size: 0.85rem;
+                                }
+                            </style>
+                            <div style="padding:20px; display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
+                                <div class="regulator-action-card" onclick="window.generateImpactReport()">
+                                    <i class="fas fa-file-pdf" style="color: #3498db;"></i>
+                                    <h4>Impact Report</h4>
+                                    <p>Download monthly PDF</p>
+                                </div>
+                                <div class="regulator-action-card" onclick="window.broadcastAlerts()">
+                                    <i class="fas fa-comment-sms" style="color: #e67e22;"></i>
+                                    <h4>Broadcast Alerts</h4>
+                                    <p>Push SMS warnings</p>
+                                </div>
+                                <div class="regulator-action-card" onclick="window.auditCredits()">
+                                    <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                                    <h4>Audit Credits</h4>
+                                    <p>Verify Carbon Offsets</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="activity-card" id="transporterWidget" style="display:none">
+                        <div class="card-header">
+                            <h3><i class="fas fa-truck-moving"></i> Fleet Management</h3>
+                        </div>
+                        <div class="insights-list" id="transporterPanel">
+                            <div style="text-align:center; padding:15px;">
+                                <p style="margin-bottom:15px;color:#666;">View map, optimize collection routes, and use
+                                    AI to cluster farms.</p>
+                                <a href="logistics.html" class="btn-primary"
+                                    style="display:inline-block; text-decoration:none;"><i
+                                        class="fas fa-map-marked-alt"></i> Launch Smart Fleet Tracker</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-leaf"></i> AgriWaste to Worth</h3>
+                    <p>Transforming agricultural waste into valuable resources.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AgriWaste to Worth. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-container">
+                <div class="auth-form" id="loginForm">
+                    <h2>Welcome Back</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Login</button>
+                        <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                    </form>
+                </div>
+                <div class="auth-form hidden" id="signupForm">
+                    <h2>Create Account</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signupName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="signupPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>User Type</label>
+                            <select id="userType" required>
+                                <option value="farmer">Farmer</option>
+                                <option value="aggregator">Aggregator</option>
+                                <option value="processor">Processor</option>
+                                <option value="transporter">Transporter</option>
+                                <option value="buyer">Buyer</option>
+                                <option value="ngo">NGO/Regulator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Sign Up</button>
+                        <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>

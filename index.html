@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriWaste to Worth - AI-Powered Biomass Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-leaf"></i>
+                <span>AgriWaste to Worth</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="ai-analyzer.html">AI Analyzer</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-icon" id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="badge" id="cartBadge">0</span></button>
+                <button class="btn-icon" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="notifBadge">0</span></button>
+                <div class="user-menu" id="userMenu" style="display:none">
+                    <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
+                    <span class="user-name">Guest</span>
+                    <span class="user-role-badge" id="userRoleBadge" style="margin-left:8px;background:#eee;padding:4px 8px;border-radius:12px;font-size:.8rem"></span>
+                    <button class="btn-text" id="logoutBtn" style="margin-left:12px">Logout</button>
+                </div>
+                <button class="btn-primary" id="loginBtn">Login</button>
+                <button class="btn-secondary" id="signupBtn">Sign Up</button>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="container hero-content">
+            <div class="hero-text animate-fade-up">
+                <h1 class="hero-title">Transform Agricultural Waste into Valuable Resources</h1>
+                <p class="hero-subtitle">AI-powered platform connecting farmers, buyers, and processors to convert biomass into profit while promoting sustainability</p>
+                <div class="hero-buttons">
+                    <button class="btn-large btn-primary" onclick="location.href='marketplace.html'">Explore Marketplace</button>
+                    <button class="btn-large btn-outline" onclick="location.href='ai-analyzer.html'">Try AI Analyzer</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h3 id="wasteProcessed">2,450+</h3>
+                        <p>Tons Processed</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 id="activeUsers">1,200+</h3>
+                        <p>Active Users</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 id="co2Saved">5,800+</h3>
+                        <p>CO₂ Tons Saved</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image-container animate-fade-in">
+                <div class="floating-card card-1">
+                    <i class="fas fa-seedling"></i>
+                    <span>Rice Husk</span>
+                    <strong>₹5,500/ton</strong>
+                </div>
+                <div class="floating-card card-2">
+                    <i class="fas fa-wheat-awn"></i>
+                    <span>Wheat Straw</span>
+                    <strong>₹4,200/ton</strong>
+                </div>
+                <div class="floating-card card-3">
+                    <i class="fas fa-chart-line"></i>
+                    <span>AI Prediction</span>
+                    <strong>95% Accurate</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header animate-fade-up">
+                <h2>Powered by Advanced AI Technology</h2>
+                <p>Comprehensive solutions for agricultural waste management</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h3>AI Waste Classification</h3>
+                    <p>Automatically identify and categorize agricultural waste types using computer vision and machine learning</p>
+                    <a href="ai-analyzer.html">Try Now <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-area"></i></div>
+                    <h3>Price Prediction</h3>
+                    <p>Real-time market price predictions based on demand, supply, season, and historical data analytics</p>
+                    <a href="ai-analyzer.html">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                    <h3>Smart Matching</h3>
+                    <p>AI-powered recommendation engine connects sellers with the most suitable buyers automatically</p>
+                    <a href="marketplace.html">Explore <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                    <h3>Carbon Footprint</h3>
+                    <p>Track environmental impact and carbon credits earned through sustainable waste repurposing</p>
+                    <a href="dashboard.html">View Dashboard <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Blockchain Security</h3>
+                    <p>Transparent and secure transactions with blockchain-based tracking and verification system</p>
+                    <a href="#">Coming Soon <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                    <h3>Quality Analysis</h3>
+                    <p>AI-driven biomass quality assessment including moisture, calorific value, and composition analysis</p>
+                    <a href="ai-analyzer.html">Analyze <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Simple steps to transform waste into worth</p>
+            </div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                    <h3>Register</h3>
+                    <p>Create your account as a farmer, buyer, or processor in under 2 minutes</p>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-camera"></i></div>
+                    <h3>List or Analyze</h3>
+                    <p>Upload waste images for AI analysis or browse marketplace listings</p>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fas fa-magic"></i></div>
+                    <h3>AI Matching</h3>
+                    <p>Our AI finds the best matches and suggests optimal pricing</p>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <h3>Trade & Earn</h3>
+                    <p>Complete transactions securely and track your earnings</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Agricultural Waste?</h2>
+                <p>Join thousands of farmers and businesses already profiting from sustainable practices</p>
+                <button class="btn-large btn-primary" id="getStartedBtn">Get Started Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-leaf"></i> AgriWaste to Worth</h3>
+                    <p>Transforming agricultural waste into valuable resources through AI-powered solutions.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="ai-analyzer.html">AI Analyzer</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe for updates and insights</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AgriWaste to Worth. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-container">
+                <div class="auth-form" id="loginForm">
+                    <h2>Welcome Back</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Login</button>
+                        <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                    </form>
+                </div>
+                <div class="auth-form hidden" id="signupForm">
+                    <h2>Create Account</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signupName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="signupPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>User Type</label>
+                            <select id="userType" required>
+                                <option value="farmer">Farmer</option>
+                                <option value="aggregator">Aggregator</option>
+                                <option value="processor">Processor</option>
+                                <option value="transporter">Transporter</option>
+                                <option value="buyer">Buyer</option>
+                                <option value="ngo">NGO/Regulator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Sign Up</button>
+                        <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Client Module (MUST be loaded first) -->
+    <script src="js/api.js"></script>
+    
+    <!-- Core Application Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

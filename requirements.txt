@@ -1,0 +1,10 @@
+streamlit
+tensorflow>=2.15.0
+numpy
+pandas
+pillow
+plotly
+matplotlib
+scikit-learn
+flask
+werkzeug

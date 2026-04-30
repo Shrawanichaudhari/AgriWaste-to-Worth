@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analyzer - AgriWaste to Worth</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-leaf"></i>
+                <span>AgriWaste to Worth</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="ai-analyzer.html" class="active">AI Analyzer</a></li>
+                <li><a href="chatbot.html">Chatbot</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-icon" id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="badge" id="cartBadge">0</span></button>
+                <button class="btn-icon" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="notifBadge">0</span></button>
+                <div class="user-menu" id="userMenu" style="display:none">
+                    <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
+                    <span class="user-name">Guest</span>
+                    <span class="user-role-badge" id="userRoleBadge" style="margin-left:8px;background:#eee;padding:4px 8px;border-radius:12px;font-size:.8rem"></span>
+                    <button class="btn-text" id="logoutBtn" style="margin-left:12px">Logout</button>
+                </div>
+                <button class="btn-primary" id="loginBtn">Login</button>
+                <button class="btn-secondary" id="signupBtn">Sign Up</button>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>AI-Powered Biomass Analyzer</h1>
+            <p>Upload images to get instant waste classification, quality analysis, and price predictions</p>
+        </div>
+    </section>
+
+    <!-- Analyzer Section -->
+    <section class="analyzer-section">
+        <div class="container">
+            <div class="analyzer-layout">
+                <!-- Upload Area -->
+                <div class="upload-section">
+                    <div class="upload-card">
+                        <div class="upload-header">
+                            <h3><i class="fas fa-robot"></i> AI Analysis Tool</h3>
+                            <p>Upload images of agricultural waste for instant AI-powered analysis</p>
+                        </div>
+                        
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="imageUpload" accept="image/*,application/pdf" multiple hidden>
+                            <label for="imageUpload" class="upload-label">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <h4>Drop images here or click to upload</h4>
+                                <p>Supports: JPG, PNG, JPEG, PDF (Max 5MB each)</p>
+                                <button type="button" class="btn-primary">Browse Files</button>
+                            </label>
+                        </div>
+
+                        <div id="uploadedImages" class="uploaded-images"></div>
+
+                        <div class="upload-actions">
+                            <button class="btn-large btn-primary" id="analyzeBtn" disabled>
+                                <i class="fas fa-magic"></i> Analyze with AI
+                            </button>
+                            <button class="btn-large btn-secondary" id="clearImagesBtn" disabled>
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+
+                        <div class="filter-group" style="margin-top:14px">
+                            <h4>Lab Reports (Encrypted Storage)</h4>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <input type="file" id="labReportUpload" accept="application/pdf">
+                                <button class="btn-outline" id="saveLabReportBtn" type="button">Encrypt & Save</button>
+                            </div>
+                            <div id="labReportsList" style="margin-top:8px;font-size:.9rem"></div>
+                        </div>
+
+                        <!-- Additional Options -->
+                        <div class="analysis-options">
+                            <h4>Analysis Options</h4>
+                            <label><input type="checkbox" id="includePrice" checked> Price Prediction</label>
+                            <label><input type="checkbox" id="includeQuality" checked> Quality Assessment</label>
+                            <label><input type="checkbox" id="includeBuyers" checked> Buyer Recommendations</label>
+                            <label><input type="checkbox" id="includeCarbon" checked> Carbon Impact</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Area -->
+                <div class="results-section">
+                    <div class="results-card" id="resultsCard">
+                        <div class="empty-state" id="emptyState">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>No Analysis Yet</h3>
+                            <p>Upload images and click "Analyze with AI" to see results</p>
+                        </div>
+
+                        <div class="results-content hidden" id="resultsContent">
+                            <!-- Classification Result -->
+                            <div class="result-section">
+                                <h3><i class="fas fa-tag"></i> Waste Classification</h3>
+                                <div class="classification-result">
+                                    <div class="main-classification">
+                                        <span class="classification-label">Identified as:</span>
+                                        <h2 id="wasteType">-</h2>
+                                        <div class="confidence-bar">
+                                            <div class="confidence-fill" id="confidenceFill"></div>
+                                        </div>
+                                        <p class="confidence-text">Confidence: <strong id="confidence">0%</strong></p>
+                                    </div>
+                                    <div class="alternative-classifications" id="alternatives"></div>
+                                </div>
+                            </div>
+
+                            <!-- Price Prediction -->
+                            <div class="result-section" id="priceSection">
+                                <h3><i class="fas fa-rupee-sign"></i> Price Prediction</h3>
+                                <div class="price-prediction">
+                                    <div class="predicted-price">
+                                        <span>Estimated Market Price</span>
+                                        <h2 id="predictedPrice">₹0</h2>
+                                        <small>per ton</small>
+                                    </div>
+                                    <div class="price-range">
+                                        <div class="range-item">
+                                            <span>Low</span>
+                                            <strong id="priceLow">₹0</strong>
+                                        </div>
+                                        <div class="range-item">
+                                            <span>High</span>
+                                            <strong id="priceHigh">₹0</strong>
+                                        </div>
+                                    </div>
+                                    <div class="price-factors">
+                                        <h4>Factors Affecting Price:</h4>
+                                        <ul id="priceFactors"></ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quality Analysis -->
+                            <div class="result-section" id="qualitySection">
+                                <h3><i class="fas fa-certificate"></i> Quality Assessment</h3>
+                                <div class="quality-metrics">
+                                    <div class="metric-card">
+                                        <i class="fas fa-tint"></i>
+                                        <span>Moisture Content</span>
+                                        <h4 id="moisture">0%</h4>
+                                    </div>
+                                    <div class="metric-card">
+                                        <i class="fas fa-fire"></i>
+                                        <span>Calorific Value</span>
+                                        <h4 id="calorific">0 MJ/kg</h4>
+                                    </div>
+                                    <div class="metric-card">
+                                        <i class="fas fa-star"></i>
+                                        <span>Overall Grade</span>
+                                        <h4 id="grade">-</h4>
+                                    </div>
+                                    <div class="metric-card">
+                                        <i class="fas fa-flask"></i>
+                                        <span>Purity</span>
+                                        <h4 id="purity">0%</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Buyer Recommendations -->
+                            <div class="result-section" id="buyersSection">
+                                <h3><i class="fas fa-users"></i> Recommended Buyers</h3>
+                                <div class="buyers-list" id="buyersList"></div>
+                            </div>
+
+                            <!-- Repurposing Suggestions -->
+                            <div class="result-section" id="repurposeSection">
+                                <h3><i class="fas fa-recycle"></i> Repurposing Suggestions</h3>
+                                <div id="repurposeList" class="buyers-list"></div>
+                            </div>
+
+                            <!-- Seasonality Chart -->
+                            <div class="result-section" id="seasonalitySection">
+                                <h3><i class="fas fa-chart-line"></i> Price Seasonality</h3>
+                                <div class="chart-container">
+                                    <canvas id="seasonalityChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Carbon Impact -->
+                            <div class="result-section" id="carbonSection">
+                                <h3><i class="fas fa-leaf"></i> Environmental Impact</h3>
+                                <div class="carbon-metrics">
+                                    <div class="impact-card">
+                                        <i class="fas fa-cloud"></i>
+                                        <span>CO₂ Equivalent Saved</span>
+                                        <h3 id="co2Saved">0 kg</h3>
+                                        <small>per ton if repurposed</small>
+                                    </div>
+                                    <div class="impact-card">
+                                        <i class="fas fa-tree"></i>
+                                        <span>Trees Equivalent</span>
+                                        <h3 id="treesEquiv">0</h3>
+                                        <small>carbon offset equivalent</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="result-actions">
+                                <button class="btn-primary" id="createListingBtn">
+                                    <i class="fas fa-plus"></i> Create Marketplace Listing
+                                </button>
+                                <button class="btn-secondary" id="downloadReportBtn">
+                                    <i class="fas fa-download"></i> Download Report
+                                </button>
+                                <button class="btn-outline" id="shareResultsBtn">
+                                    <i class="fas fa-share"></i> Share Results
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div class="loading-state hidden" id="loadingState">
+                            <div class="loader"></div>
+                            <h3>Analyzing with AI...</h3>
+                            <p>Please wait while our neural network processes your images</p>
+                            <div class="analysis-steps">
+                                <div class="step-item active">
+                                    <i class="fas fa-image"></i> Image preprocessing
+                                </div>
+                                <div class="step-item">
+                                    <i class="fas fa-brain"></i> Classification
+                                </div>
+                                <div class="step-item">
+                                    <i class="fas fa-chart-bar"></i> Quality analysis
+                                </div>
+                                <div class="step-item">
+                                    <i class="fas fa-calculator"></i> Price prediction
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fas fa-eye"></i>
+                    <h4>Computer Vision</h4>
+                    <p>Advanced CNN models trained on 50,000+ agricultural waste images</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-brain"></i>
+                    <h4>Deep Learning</h4>
+                    <p>Multi-layer neural networks for accurate waste type identification</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>Market Intelligence</h4>
+                    <p>Real-time price prediction using time-series analysis & market data</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-shield-check"></i>
+                    <h4>95% Accuracy</h4>
+                    <p>Validated accuracy across 30+ waste categories with continuous learning</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-leaf"></i> AgriWaste to Worth</h3>
+                    <p>Transforming agricultural waste into valuable resources.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="ai-analyzer.html">AI Analyzer</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AgriWaste to Worth. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-container">
+                <div class="auth-form" id="loginForm">
+                    <h2>Welcome Back</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Login</button>
+                        <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                    </form>
+                </div>
+                <div class="auth-form hidden" id="signupForm">
+                    <h2>Create Account</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="signupName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="signupPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>User Type</label>
+                            <select id="userType" required>
+                                <option value="farmer">Farmer</option>
+                                <option value="aggregator">Aggregator</option>
+                                <option value="processor">Processor</option>
+                                <option value="transporter">Transporter</option>
+                                <option value="buyer">Buyer</option>
+                                <option value="ngo">NGO/Regulator</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Sign Up</button>
+                        <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/ai-analyzer.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
