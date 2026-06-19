@@ -11,7 +11,11 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'webm', 'wav', 'mp3', 'm4a'}
 
-groq_client = Groq(api_key="GROQ_API_KEY_PLACEHOLDER")
+# Set GROQ_API_KEY environment variable before running
+groq_api_key = os.getenv('GROQ_API_KEY')
+if not groq_api_key:
+    raise ValueError("GROQ_API_KEY environment variable is not set.")
+groq_client = Groq(api_key=groq_api_key)
 
 
 def allowed_file(filename):

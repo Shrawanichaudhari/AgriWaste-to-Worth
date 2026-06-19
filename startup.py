@@ -62,7 +62,9 @@ def setup_env():
     
     # Set Groq API key if not already set
     if 'GROQ_API_KEY' not in os.environ:
-        os.environ['GROQ_API_KEY'] = 'GROQ_API_KEY_PLACEHOLDER'
+        print("⚠️  GROQ_API_KEY is not set. Please set it as an environment variable.")
+        print("   Example: set GROQ_API_KEY=your_key_here  (Windows)")
+        print("            export GROQ_API_KEY=your_key_here  (Linux/Mac)")
 
 def start_server():
     """Start the Flask server"""

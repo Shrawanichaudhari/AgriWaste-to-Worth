@@ -3,7 +3,11 @@ import time
 from groq import Groq
 from gtts import gTTS
 
-groq_client = Groq(api_key="GROQ_API_KEY_PLACEHOLDER")
+# Set GROQ_API_KEY environment variable before running
+groq_api_key = os.getenv('GROQ_API_KEY')
+if not groq_api_key:
+    raise ValueError("GROQ_API_KEY environment variable is not set.")
+groq_client = Groq(api_key=groq_api_key)
 
 def transcribe_audio(filepath):
     with open(filepath, "rb") as f:

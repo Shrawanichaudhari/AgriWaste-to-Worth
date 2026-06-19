@@ -6,6 +6,8 @@
     <title>Marketplace - AgriWaste to Worth</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Razorpay Payment SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -312,18 +314,30 @@
     <!-- Cart Sidebar -->
     <div id="cartSidebar" class="sidebar">
         <div class="sidebar-header">
-            <h3>Shopping Cart</h3>
+            <h3><i class="fas fa-shopping-cart"></i> Shopping Cart</h3>
             <button class="close-sidebar"><i class="fas fa-times"></i></button>
         </div>
         <div class="sidebar-content" id="cartContent">
             <!-- Cart items will be loaded here -->
         </div>
         <div class="sidebar-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <strong id="cartTotal">₹0</strong>
+            <div class="cart-total-row">
+                <div class="cart-total-label">
+                    <i class="fas fa-receipt"></i> Order Total
+                </div>
+                <strong id="cartTotal" class="cart-total-amount">₹0</strong>
             </div>
-            <button class="btn-primary btn-block" id="checkoutBtn">Proceed to Checkout</button>
+            <div class="cart-footer-actions">
+                <button class="btn-outline-green" id="clearCartBtn" onclick="AppState.cart=[];AppState.saveCart();updateCartBadge();loadCartItems()">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+                <button class="btn-primary btn-checkout" id="checkoutBtn">
+                    <i class="fas fa-lock"></i> Secure Checkout
+                </button>
+            </div>
+            <div class="cart-security-note">
+                <i class="fas fa-shield-alt"></i> Secured by Razorpay &bull; 256-bit SSL
+            </div>
         </div>
     </div>
 
@@ -350,7 +364,97 @@
         </div>
     </footer>
 
-    
+    <!-- Checkout Modal (Address + Payment) -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content checkout-modal-content">
+            <span class="close" onclick="document.getElementById('checkoutModal').classList.remove('active')">&times;</span>
+            <div class="checkout-modal-header">
+                <div class="checkout-modal-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <h2>Delivery Details</h2>
+                    <p class="checkout-modal-sub">Enter your address to receive the order</p>
+                </div>
+            </div>
+
+            <div class="checkout-layout">
+                <!-- Left: Address Form -->
+                <div class="checkout-address-section">
+                    <h3 class="section-label"><i class="fas fa-home"></i> Delivery Address</h3>
+                    <div class="co-form">
+                        <div class="co-form-row">
+                            <div class="co-form-group">
+                                <label for="co_fullname">Full Name *</label>
+                                <input type="text" id="co_fullname" placeholder="e.g. Ramesh Kumar" autocomplete="name">
+                            </div>
+                            <div class="co-form-group">
+                                <label for="co_phone">Mobile Number *</label>
+                                <input type="tel" id="co_phone" placeholder="10-digit mobile" maxlength="10" autocomplete="tel">
+                            </div>
+                        </div>
+                        <div class="co-form-group full-width">
+                            <label for="co_email">Email Address *</label>
+                            <input type="email" id="co_email" placeholder="email@example.com" autocomplete="email">
+                        </div>
+                        <div class="co-form-group full-width">
+                            <label for="co_address1">Street Address / Village / House No. *</label>
+                            <input type="text" id="co_address1" placeholder="e.g. 12, Green Fields, Near Panchayat Ghar" autocomplete="street-address">
+                        </div>
+                        <div class="co-form-row">
+                            <div class="co-form-group">
+                                <label for="co_city">City / Town *</label>
+                                <input type="text" id="co_city" placeholder="e.g. Ludhiana" autocomplete="address-level2">
+                            </div>
+                            <div class="co-form-group">
+                                <label for="co_state">State *</label>
+                                <select id="co_state" autocomplete="address-level1">
+                                    <option value="">Select State</option>
+                                    <option>Andhra Pradesh</option><option>Assam</option>
+                                    <option>Bihar</option><option>Chhattisgarh</option>
+                                    <option>Gujarat</option><option>Haryana</option>
+                                    <option>Himachal Pradesh</option><option>Jharkhand</option>
+                                    <option>Karnataka</option><option>Kerala</option>
+                                    <option>Madhya Pradesh</option><option>Maharashtra</option>
+                                    <option>Odisha</option><option>Punjab</option>
+                                    <option>Rajasthan</option><option>Tamil Nadu</option>
+                                    <option>Telangana</option><option>Uttar Pradesh</option>
+                                    <option>Uttarakhand</option><option>West Bengal</option>
+                                </select>
+                            </div>
+                            <div class="co-form-group">
+                                <label for="co_pincode">PIN Code *</label>
+                                <input type="text" id="co_pincode" placeholder="6-digit PIN" maxlength="6" autocomplete="postal-code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="checkout-summary-section">
+                    <h3 class="section-label"><i class="fas fa-receipt"></i> Order Summary</h3>
+                    <div id="checkoutOrderSummary" class="co-order-summary">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="co-pay-amount">
+                        <span>You Pay</span>
+                        <strong id="checkoutTotalAmt">₹0</strong>
+                    </div>
+
+                    <button class="btn-pay-now" onclick="window.initiateRazorpayPayment()">
+                        <i class="fas fa-lock"></i>
+                        Pay Securely with Razorpay
+                    </button>
+                    <div class="co-security">
+                        <i class="fas fa-shield-alt"></i> 256-bit SSL &bull; Secured by Razorpay
+                        <div class="co-payment-icons">
+                            <img src="https://razorpay.com/favicon.ico" alt="Razorpay" style="height:18px;vertical-align:middle;margin:0 2px">
+                            <span>UPI &bull; Cards &bull; Netbanking &bull; Wallets</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Auth Modal -->
     <div id="authModal" class="modal">
         <div class="modal-content">

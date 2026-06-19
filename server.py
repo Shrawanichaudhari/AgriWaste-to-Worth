@@ -16,20 +16,20 @@ import traceback
 try:
     from ai_system import AgriculturalAISystem, create_api_app
     AI_AVAILABLE = True
-    print("✓ AI System loaded")
+    print("[OK] AI System loaded")
 except Exception as e:
     AI_AVAILABLE = False
-    print(f"⚠ AI System not available: {e}")
+    print(f"[WARN] AI System not available: {e}")
 
 # Try to import chatbot components
 try:
     from groq import Groq
     from gtts import gTTS
     CHATBOT_AVAILABLE = True
-    print("✓ Chatbot components loaded")
+    print("[OK] Chatbot components loaded")
 except Exception as e:
     CHATBOT_AVAILABLE = False
-    print(f"⚠ Chatbot not available: {e}")
+    print(f"[WARN] Chatbot not available: {e}")
 
 
 # Create main Flask app
@@ -60,7 +60,9 @@ if AI_AVAILABLE:
 # Initialize Chatbot if available
 if CHATBOT_AVAILABLE:
     try:
-        groq_api_key = os.getenv('GROQ_API_KEY', 'GROQ_API_KEY_PLACEHOLDER')
+        groq_api_key = os.getenv('GROQ_API_KEY')
+        if not groq_api_key:
+            raise ValueError("GROQ_API_KEY environment variable is not set. Please set it before running the server.")
         groq_client = Groq(api_key=groq_api_key)
         print("✓ Chatbot initialized")
     except Exception as e:

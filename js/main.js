@@ -131,63 +131,200 @@ function removeFromCart(itemId) {
 function loadCartItems() {
     const cartContent = document.getElementById('cartContent');
     const cartTotal = document.getElementById('cartTotal');
-    
+
     if (!cartContent) return;
-    
+
     if (AppState.cart.length === 0) {
-        cartContent.innerHTML = '<p style="text-align:center;color:#999;">Your cart is empty</p>';
+        cartContent.innerHTML = `
+            <div class="cart-empty-state">
+                <div class="cart-empty-icon"><i class="fas fa-shopping-basket"></i></div>
+                <p class="cart-empty-title">Your cart is empty</p>
+                <p class="cart-empty-sub">Add items from the marketplace to get started</p>
+            </div>`;
         if (cartTotal) cartTotal.textContent = '₹0';
         return;
     }
-    
+
     let total = 0;
     cartContent.innerHTML = '';
-    
+
     AppState.cart.forEach(item => {
         const itemTotal = item.price * (item.quantity || 1);
         total += itemTotal;
-        
+        const qty = item.quantity || 1;
+
         const cartItemHTML = `
-            <div class="cart-item">
+            <div class="cart-item" data-id="${item.id}">
                 <div class="cart-item-image">
                     <i class="fas fa-seedling"></i>
                 </div>
                 <div class="cart-item-details">
                     <div class="cart-item-title">${item.name}</div>
-                    <div class="cart-item-price">₹${item.price.toLocaleString()}/ton × ${item.quantity}</div>
-                    <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">Remove</button>
+                    <div class="cart-item-seller"><i class="fas fa-store-alt"></i> ${item.seller || 'Verified Supplier'}</div>
+                    <div class="cart-item-price">₹${item.price.toLocaleString()} <span class="per-unit">/ton</span></div>
+                    <div class="cart-item-controls">
+                        <button class="qty-btn" onclick="changeCartQty('${item.id}', -1)"><i class="fas fa-minus"></i></button>
+                        <span class="qty-val">${qty} ton${qty>1?'s':''}</span>
+                        <button class="qty-btn" onclick="changeCartQty('${item.id}', 1)"><i class="fas fa-plus"></i></button>
+                        <button class="cart-item-remove" onclick="removeFromCart('${item.id}')"><i class="fas fa-trash-alt"></i> Remove</button>
+                    </div>
+                    <div class="cart-item-subtotal">Subtotal: <strong>₹${itemTotal.toLocaleString()}</strong></div>
                 </div>
             </div>
         `;
         cartContent.innerHTML += cartItemHTML;
     });
-    
-    if (cartTotal) cartTotal.textContent = `₹${total.toLocaleString()}`;
 
-    // Add Checkout Button
-    const checkoutBtn = document.createElement('button');
-    checkoutBtn.className = 'btn-primary btn-block';
-    checkoutBtn.style.marginTop = '20px';
-    checkoutBtn.innerHTML = '<i class="fas fa-truck-loading"></i> Place Pickup Order';
-    checkoutBtn.onclick = () => window.checkout();
-    cartContent.appendChild(checkoutBtn);
+    if (cartTotal) cartTotal.textContent = `₹${total.toLocaleString()}`;
 }
 
-// Checkout Functionality
-window.checkout = function() {
-    if (AppState.cart.length === 0) return;
+// ─── Change cart quantity ────────────────────────────────────────────
+window.changeCartQty = function(itemId, delta) {
+    const item = AppState.cart.find(i => i.id === itemId);
+    if (!item) return;
+    item.quantity = Math.max(1, (item.quantity || 1) + delta);
+    AppState.saveCart();
+    updateCartBadge();
+    loadCartItems();
+};
 
+// ─── Open Checkout Modal ──────────────────────────────────────────────
+window.openCheckoutModal = function() {
+    if (AppState.cart.length === 0) {
+        showNotification('Your cart is empty!', 'error');
+        return;
+    }
     if (!AppState.currentUser) {
-        showNotification(' Please login to place an order', 'warning');
-        document.getElementById('loginBtn')?.click();
+        showNotification('Please login to continue', 'warning');
+        document.getElementById('cartSidebar')?.classList.remove('active');
+        setTimeout(() => document.getElementById('loginBtn')?.click(), 400);
+        return;
+    }
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        // Populate order summary in modal
+        const total = AppState.cart.reduce((s, i) => s + i.price * (i.quantity || 1), 0);
+        const summaryEl = document.getElementById('checkoutOrderSummary');
+        if (summaryEl) {
+            summaryEl.innerHTML = AppState.cart.map(item => `
+                <div class="co-item">
+                    <span>${item.name} × ${item.quantity || 1} ton${(item.quantity||1)>1?'s':''}</span>
+                    <strong>₹${(item.price*(item.quantity||1)).toLocaleString()}</strong>
+                </div>
+            `).join('') + `
+                <div class="co-total">
+                    <span>Total Amount</span>
+                    <strong>₹${total.toLocaleString()}</strong>
+                </div>`;
+        }
+        document.getElementById('checkoutTotalAmt').textContent = `₹${total.toLocaleString()}`;
+        modal.classList.add('active');
+    }
+};
+
+// ─── Razorpay Payment ────────────────────────────────────────────────
+window.initiateRazorpayPayment = function() {
+    const fullName = document.getElementById('co_fullname')?.value.trim();
+    const phone    = document.getElementById('co_phone')?.value.trim();
+    const email    = document.getElementById('co_email')?.value.trim();
+    const addr1    = document.getElementById('co_address1')?.value.trim();
+    const city     = document.getElementById('co_city')?.value.trim();
+    const state    = document.getElementById('co_state')?.value.trim();
+    const pincode  = document.getElementById('co_pincode')?.value.trim();
+
+    if (!fullName || !phone || !email || !addr1 || !city || !state || !pincode) {
+        showNotification('Please fill in all address fields.', 'error');
+        return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+        showNotification('Enter a valid 10-digit Indian mobile number.', 'error');
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showNotification('Enter a valid email address.', 'error');
+        return;
+    }
+    if (!/^\d{6}$/.test(pincode)) {
+        showNotification('Enter a valid 6-digit PIN code.', 'error');
         return;
     }
 
-    // Move cart items to logistics queue
+    const total = AppState.cart.reduce((s, i) => s + i.price * (i.quantity || 1), 0);
+    const amountPaise = total * 100; // Razorpay uses paise
+
+    const deliveryAddress = `${addr1}, ${city}, ${state} - ${pincode}`;
+
+    const options = {
+        key: 'rzp_test_Si2jYQPhVrCNhZ',
+        amount: amountPaise,
+        currency: 'INR',
+        name: 'AgriWaste to Worth',
+        description: `Order for ${AppState.cart.length} item(s)`,
+        image: 'https://via.placeholder.com/60x60.png?text=AW',
+        handler: function(response) {
+            onPaymentSuccess(response, {
+                name: fullName, phone, email,
+                address: deliveryAddress
+            });
+        },
+        prefill: {
+            name: fullName,
+            email: email,
+            contact: phone
+        },
+        notes: {
+            delivery_address: deliveryAddress
+        },
+        theme: {
+            color: '#2ecc71'
+        },
+        modal: {
+            ondismiss: function() {
+                showNotification('Payment cancelled. Your cart is safe.', 'info');
+            }
+        }
+    };
+
+    if (typeof Razorpay === 'undefined') {
+        showNotification('Payment gateway not loaded. Please check your internet connection.', 'error');
+        return;
+    }
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(resp) {
+        showNotification('Payment failed: ' + (resp.error?.description || 'Unknown error'), 'error');
+    });
+    rzp.open();
+};
+
+// ─── On Payment Success ───────────────────────────────────────────────
+function onPaymentSuccess(razorpayResponse, userDetails) {
+    const total = AppState.cart.reduce((s, i) => s + i.price * (i.quantity || 1), 0);
+    const txnId = 'TXN' + Date.now();
+    const orderId = 'ORD-' + Math.random().toString(36).substr(2,8).toUpperCase();
+
+    // Save transaction
+    const transaction = {
+        id: txnId,
+        orderId,
+        razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+        items: [...AppState.cart],
+        total,
+        deliveryAddress: userDetails.address,
+        customerName: userDetails.name,
+        customerEmail: userDetails.email,
+        customerPhone: userDetails.phone,
+        date: new Date(),
+        status: 'paid'
+    };
+    const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    transactions.unshift(transaction);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    // Add to logistics queue
     const newPickups = AppState.cart.map(item => ({
         id: `PK-${Math.floor(Math.random() * 900) + 100}`,
-        name: `${AppState.currentUser.name}'s ${item.name}`,
-        lat: 30.85 + (Math.random() * 0.1), // Random-ish location in Ludhiana
+        name: `${userDetails.name}'s ${item.name}`,
+        lat: 30.85 + (Math.random() * 0.1),
         lng: 75.80 + (Math.random() * 0.1),
         volume: `${item.quantity} tons`,
         decay: Math.random() > 0.5 ? 'High' : 'Medium',
@@ -196,20 +333,56 @@ window.checkout = function() {
         riskClass: Math.random() > 0.5 ? 'high-risk' : 'medium-risk',
         timestamp: new Date().toISOString()
     }));
-
-    AppState.logisticsQueue = [...AppState.logisticsQueue, ...newPickups];
+    AppState.logisticsQueue = [...(AppState.logisticsQueue || []), ...newPickups];
     AppState.saveLogistics();
 
     // Clear cart
     AppState.cart = [];
     AppState.saveCart();
     updateCartBadge();
-    loadCartItems();
 
-    showNotification('Order placed! Pickup scheduled in Logistics.', 'success');
-    
-    // Optional: Redirect to logistics
-    // setTimeout(() => location.href = 'logistics.html', 1500);
+    // Close modals
+    document.getElementById('checkoutModal')?.classList.remove('active');
+    document.getElementById('cartSidebar')?.classList.remove('active');
+
+    // Show success screen
+    showOrderSuccessModal(orderId, razorpayResponse.razorpay_payment_id, total, userDetails.address);
+    addNotification('Payment Successful 🎉', `Order ${orderId} paid ₹${total.toLocaleString()} — delivery to ${userDetails.address}`, 'success');
+}
+
+// ─── Order Success Modal ──────────────────────────────────────────────
+function showOrderSuccessModal(orderId, paymentId, total, address) {
+    const existing = document.getElementById('orderSuccessModal');
+    if (existing) existing.remove();
+
+    const m = document.createElement('div');
+    m.id = 'orderSuccessModal';
+    m.className = 'modal active';
+    m.innerHTML = `
+        <div class="modal-content order-success-modal">
+            <div class="success-anim">
+                <div class="success-circle"><i class="fas fa-check"></i></div>
+            </div>
+            <h2 class="success-title">Payment Successful! 🎉</h2>
+            <p class="success-sub">Thank you for your order. Your items will be dispatched soon.</p>
+            <div class="success-details">
+                <div class="sdet-row"><span>Order ID</span><strong>${orderId}</strong></div>
+                <div class="sdet-row"><span>Payment ID</span><strong>${paymentId}</strong></div>
+                <div class="sdet-row"><span>Amount Paid</span><strong>₹${total.toLocaleString()}</strong></div>
+                <div class="sdet-row"><span>Delivery To</span><strong>${address}</strong></div>
+            </div>
+            <div class="success-actions">
+                <button class="btn-primary" onclick="document.getElementById('orderSuccessModal').remove(); window.location.href='dashboard.html'">
+                    <i class="fas fa-chart-line"></i> View Dashboard
+                </button>
+                <button class="btn-secondary" onclick="document.getElementById('orderSuccessModal').remove()">
+                    Continue Shopping
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(m);
+    m.addEventListener('click', e => { if (e.target === m) m.remove(); });
 }
 
 // Cart sidebar toggle
@@ -393,51 +566,9 @@ document.getElementById('getStartedBtn')?.addEventListener('click', () => {
     }
 });
 
-// Checkout handler (escrow-enabled)
+// Checkout button → open address + payment modal
 document.getElementById('checkoutBtn')?.addEventListener('click', () => {
-    if (AppState.cart.length === 0) {
-        showNotification('Your cart is empty!', 'error');
-        return;
-    }
-    
-    if (!AppState.currentUser) {
-        showNotification('Please login to continue', 'error');
-        document.getElementById('cartSidebar')?.classList.remove('active');
-        setTimeout(() => document.getElementById('loginBtn')?.click(), 500);
-        return;
-    }
-    
-    // Process checkout
-    const total = AppState.cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-    
-    // Simulate transaction (escrow)
-    const transaction = {
-        id: 'TXN' + Date.now(),
-        items: [...AppState.cart],
-        total: total,
-        date: new Date(),
-        status: 'in_escrow'
-    };
-    
-    // Save transaction
-    const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-    transactions.unshift(transaction);
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    
-    // Clear cart
-    AppState.cart = [];
-    AppState.saveCart();
-    updateCartBadge();
-    
-    // Close cart
-    document.getElementById('cartSidebar')?.classList.remove('active');
-    
-    // Show success
-    showNotification('Order placed in escrow!', 'success');
-    addNotification('Order in Escrow', `Order ₹${total.toLocaleString()} awaits delivery & QC`, 'info');
-    
-    // Redirect to dashboard
-    setTimeout(() => window.location.href = 'dashboard.html', 2000);
+    window.openCheckoutModal();
 });
 
 // Utility functions
